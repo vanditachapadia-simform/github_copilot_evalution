@@ -1,8 +1,17 @@
-<div>
-  <nav>
-    <a routerLink="/">Home</a> | 
-    <a routerLink="/health">Health</a>
-  </nav>
-  <hr>
-  <router-outlet></router-outlet>
+<div class="app-container">
+  <header class="app-header">
+    <h1 class="app-title">Task Management App</h1>
+    <nav class="app-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+      <a routerLink="/health" routerLinkActive="active">Health</a>
+    </nav>
+  </header>
+  
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <!-- Sync Status Component -->
+  <app-sync-status></app-sync-status>
 </div>

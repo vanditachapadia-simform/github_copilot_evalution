@@ -1,0 +1,125 @@
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-content task-form-modal" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2>{{ formTitle }}</h2>
+      <button class="close-btn" (click)="onCancel()" type="button">×</button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-error">
+      <span>{{ error }}</span>
+      <button class="close-btn" (click)="dismissError()" type="button">×</button>
+    </div>
+
+    <!-- Task Form -->
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="task-form">
+      <div class="form-body">
+        <!-- Title Field -->
+        <div class="form-group">
+          <label for="title" class="form-label required">Title</label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            class="form-input"
+            [class.error]="isFieldInvalid('title')"
+            placeholder="Enter task title"
+            maxlength="100">
+          <div *ngIf="isFieldInvalid('title')" class="field-error">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-group">
+          <label for="description" class="form-label required">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="form-textarea"
+            [class.error]="isFieldInvalid('description')"
+            placeholder="Enter task description"
+            rows="4"
+            maxlength="500">
+          </textarea>
+          <div class="char-counter">
+            {{ taskForm.get('description')?.value?.length || 0 }}/500
+          </div>
+          <div *ngIf="isFieldInvalid('description')" class="field-error">
+            {{ getFieldError('description') }}
+          </div>
+        </div>
+
+        <!-- Status and Priority Row -->
+        <div class="form-row">
+          <!-- Status Field -->
+          <div class="form-group">
+            <label for="status" class="form-label required">Status</label>
+            <select
+              id="status"
+              formControlName="status"
+              class="form-select"
+              [class.error]="isFieldInvalid('status')">
+              <option *ngFor="let status of statusOptions" [value]="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+            <div *ngIf="isFieldInvalid('status')" class="field-error">
+              {{ getFieldError('status') }}
+            </div>
+          </div>
+
+          <!-- Priority Field -->
+          <div class="form-group">
+            <label for="priority" class="form-label required">Priority</label>
+            <select
+              id="priority"
+              formControlName="priority"
+              class="form-select"
+              [class.error]="isFieldInvalid('priority')">
+              <option *ngFor="let priority of priorityOptions" [value]="priority.value">
+                {{ priority.label }}
+              </option>  
+            </select>
+            <div *ngIf="isFieldInvalid('priority')" class="field-error">
+              {{ getFieldError('priority') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Due Date Field -->
+        <div class="form-group">
+          <label for="dueDate" class="form-label required">Due Date</label>
+          <input
+            id="dueDate"
+            type="date"
+            formControlName="dueDate"
+            class="form-input"
+            [class.error]="isFieldInvalid('dueDate')">
+          <div *ngIf="isFieldInvalid('dueDate')" class="field-error">
+            {{ getFieldError('dueDate') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="taskForm.invalid || isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner spinner-sm"></span>
+          <span [class.sr-only]="isSubmitting">{{ submitButtonText }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

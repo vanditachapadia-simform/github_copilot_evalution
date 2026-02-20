@@ -1,0 +1,254 @@
+<div class="task-management">
+  <!-- Header -->
+  <div class="task-header">
+    <h1>Task Management</h1>
+    <button 
+      class="btn btn-primary" 
+      (click)="showCreateForm()"
+      [disabled]="isLoading">
+      <span class="icon">+</span>
+      New Task
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-error">
+    <span>{{ error }}</span>
+    <button class="close-btn" (click)="dismissError()">×</button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading tasks...</p>
+  </div>
+
+  <!-- Task Statistics -->
+  <div class="task-stats">
+    <div class="stat-card">
+      <div class="stat-value">{{ taskStats.total }}</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card status-todo">
+      <div class="stat-value">{{ taskStats.todo }}</div>
+      <div class="stat-label">To Do</div>
+    </div>
+    <div class="stat-card status-progress">
+      <div class="stat-value">{{ taskStats.inProgress }}</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card status-completed">
+      <div class="stat-value">{{ taskStats.completed }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="task-controls">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (keyup.enter)="onSearch()"
+        (blur)="onSearch()"
+        placeholder="Search tasks..."
+        class="search-input">
+      <button 
+        class="btn btn-sm btn-secondary search-btn" 
+        (click)="onSearch()"
+        title="Search">
+        🔍
+      </button>
+    </div>
+    
+    <div class="filter-buttons">
+      <button 
+        class="filter-btn"
+        [class.active]="statusFilter === 'all'"
+        (click)="filterByStatus('all')">
+        All
+      </button>
+      <button 
+        class="filter-btn status-todo"
+        [class.active]="statusFilter === 'todo'"
+        (click)="filterByStatus('todo')">
+        To Do
+      </button>
+      <button 
+        class="filter-btn status-progress"
+        [class.active]="statusFilter === 'in-progress'"
+        (click)="filterByStatus('in-progress')">
+        In Progress
+      </button>
+      <button 
+        class="filter-btn status-completed"
+        [class.active]="statusFilter === 'completed'"
+        (click)="filterByStatus('completed')">
+        Completed
+      </button>
+    </div>
+  </div>
+
+  <!-- Sorting and View Controls -->
+  <div class="sorting-controls">
+    <div class="sort-section">
+      <label for="sortField">Sort by:</label>
+      <select 
+        id="sortField"
+        [(ngModel)]="sortField" 
+        (change)="onSortChange()"
+        class="form-select">
+        <option *ngFor="let field of sortableFields" [value]="field.value">
+          {{ field.label }}
+        </option>
+      </select>
+      
+      <button 
+        class="btn btn-sm btn-secondary sort-order-btn"
+        (click)="toggleSortOrder()"
+        title="Toggle sort order">
+        {{ sortOrder === 'asc' ? '▲' : '▼' }}
+        {{ sortOrder === 'asc' ? 'Ascending' : 'Descending' }}
+      </button>
+    </div>
+
+    <div class="pagination-info">
+      <span *ngIf="paginationMeta">
+        Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, totalItems) }} 
+        of {{ totalItems }} tasks
+      </span>
+    </div>
+
+    <div class="page-size-section">
+      <label for="pageSize">Items per page:</label>
+      <select 
+        id="pageSize"
+        [(ngModel)]="itemsPerPage" 
+        (change)="onPageSizeChange()"
+        class="form-select">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Task List Container -->
+  <div class="task-list-container">
+    <!-- Empty State -->
+    <div *ngIf="filteredTasks.length === 0 && !isLoading" class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h3>{{ totalItems === 0 ? 'No tasks yet' : 'No tasks match your filter' }}</h3>
+      <p>{{ totalItems === 0 ? 'Create your first task to get started!' : 'Try adjusting your search or filter criteria.' }}</p>
+      <button 
+        *ngIf="totalItems === 0"
+        class="btn btn-primary" 
+        (click)="showCreateForm()">
+        Create First Task
+      </button>
+    </div>
+
+    <!-- Task List -->
+    <div *ngIf="filteredTasks.length > 0" 
+         class="task-list"
+         cdkDropList
+         (cdkDropListDropped)="drop($event)">
+      <div
+        *ngFor="let task of filteredTasks; trackBy: trackByTaskId"
+        class="task-item-wrapper"
+        cdkDrag
+        (cdkDragStarted)="onDragStarted(task)"
+        (cdkDragEnded)="onDragEnded()"
+        (cdkDragMoved)="onDragMoved($event)">
+        
+        <!-- Drag Handle -->
+        <div class="drag-handle" cdkDragHandle>
+          <span class="drag-icon">⋮⋮</span>
+        </div>
+        
+        <!-- Task Item Component -->
+        <app-task-item
+          [task]="task"
+          [class.dragging]="isDragging"
+          (edit)="editTask($event)"
+          (delete)="deleteTask($event)"
+          (statusChange)="updateTaskStatus($event.task, $event.status)">
+        </app-task-item>
+        
+        <!-- Custom Drag Preview -->
+        <div *cdkDragPreview class="drag-preview">
+          <div class="drag-preview-content">
+            <span class="drag-icon">⋮⋮</span>
+            <span class="task-title">{{ task.title }}</span>
+          </div>
+        </div>
+        
+        <!-- Drag Placeholder -->
+        <div *cdkDragPlaceholder class="drag-placeholder">
+          <div class="placeholder-content">Drop here</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div *ngIf="paginationMeta && totalPages > 1" class="pagination-container">
+    <nav class="pagination-nav">
+      <button 
+        class="pagination-btn"
+        [disabled]="!hasPreviousPage || isLoading"
+        (click)="onPageChange(1)"
+        title="First page">
+        ⏪
+      </button>
+      
+      <button 
+        class="pagination-btn"
+        [disabled]="!hasPreviousPage || isLoading"
+        (click)="onPageChange(currentPage - 1)"
+        title="Previous page">
+        ◀️
+      </button>
+
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          class="pagination-btn page-number"
+          [class.active]="page === currentPage"
+          [disabled]="isLoading"
+          (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <button 
+        class="pagination-btn"
+        [disabled]="!hasNextPage || isLoading"
+        (click)="onPageChange(currentPage + 1)"
+        title="Next page">
+        ▶️
+      </button>
+      
+      <button 
+        class="pagination-btn"
+        [disabled]="!hasNextPage || isLoading"
+        (click)="onPageChange(totalPages)"
+        title="Last page">
+        ⏭️
+      </button>
+    </nav>
+
+    <div class="pagination-summary">
+      Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} total tasks)
+    </div>
+  </div>
+
+  <!-- Task Form Modal -->
+  <app-task-form
+    *ngIf="isFormVisible"
+    [task]="selectedTask"
+    (taskCreated)="onTaskCreated($event)"
+    (taskUpdated)="onTaskUpdated($event)"
+    (cancel)="closeForm()">
+  </app-task-form>
+</div>

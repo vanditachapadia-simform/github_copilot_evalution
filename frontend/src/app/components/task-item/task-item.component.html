@@ -1,0 +1,87 @@
+<div class="task-item" [class.expanded]="isExpanded" [class.overdue]="isOverdue">
+  <!-- Task Header -->
+  <div class="task-header" (click)="toggleExpanded()">
+    <div class="task-main">
+      <div class="task-title-section">
+        <h3 class="task-title">{{ task.title }}</h3>
+        <div class="task-badges">
+          <span class="badge status-badge" [ngClass]="statusClass">
+            {{ statusLabel }}
+          </span>
+          <span class="badge priority-badge" [ngClass]="priorityClass">
+            {{ priorityLabel }}
+          </span>
+          <span *ngIf="isOverdue" class="badge overdue-badge">
+            Overdue
+          </span>
+        </div>
+      </div>
+      
+      <div class="task-meta">
+        <span class="due-date" [class.overdue-text]="isOverdue">
+          Due: {{ formattedDate }}
+        </span>
+      </div>
+    </div>
+
+    <div class="task-actions">
+      <button 
+        class="action-btn expand-btn"
+        [class.expanded]="isExpanded"
+        title="{{ isExpanded ? 'Collapse' : 'Expand' }}">
+        <span class="chevron">▼</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Expanded Content -->
+  <div *ngIf="isExpanded" class="task-details">
+    <div class="task-description">
+      <p>{{ task.description }}</p>
+    </div>
+
+    <div class="task-info">
+      <div class="info-row">
+        <label>Created:</label>
+        <span>{{ task.createdAt | date:'MMM d, y, h:mm a' }}</span>
+      </div>
+      <div class="info-row">
+        <label>Updated:</label>
+        <span>{{ task.updatedAt | date:'MMM d, y, h:mm a' }}</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="task-controls">
+      <div class="status-controls">
+        <label>Change Status:</label>
+        <div class="status-buttons">
+          <button 
+            *ngFor="let status of getAvailableStatuses()"
+            class="btn btn-sm status-btn"
+            [ngClass]="'btn-' + status.value"
+            (click)="onStatusChange(status.value)">
+            {{ status.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button 
+          class="btn btn-sm btn-secondary" 
+          (click)="onEdit()"
+          title="Edit Task">
+          <span class="icon">✏️</span>
+          Edit
+        </button>
+        <button 
+          class="btn btn-sm btn-danger" 
+          (click)="onDelete()"
+          title="Delete Task">
+          <span class="icon">🗑️</span>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
