@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "sessionStart": {
+      "command": "node .github/hooks/logger.js sessionStart"
+    },
+    "preToolUse": {
+      "command": "node .github/hooks/logger.js preToolUse"
+    }
+  },
+  "logFile": ".github/hooks/security.log"
+}
