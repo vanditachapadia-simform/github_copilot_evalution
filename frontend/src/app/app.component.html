@@ -1,16 +1,22 @@
 <div class="app-container">
-  <header class="app-header">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <header class="app-header" role="banner">
     <h1 class="app-title">Task Management App</h1>
-    <nav class="app-nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-      <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
-      <a routerLink="/health" routerLinkActive="active">Health</a>
+    <nav class="app-nav" role="navigation" aria-label="Main navigation">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" aria-label="Navigate to home">Home</a>
+      <a routerLink="/tasks" routerLinkActive="active" aria-label="Navigate to tasks">Tasks</a>
+      <a routerLink="/health" routerLinkActive="active" aria-label="Navigate to health check">Health</a>
     </nav>
   </header>
   
-  <main class="app-main">
+  <main id="main-content" class="app-main" role="main">
     <router-outlet></router-outlet>
   </main>
+
+  <footer class="app-footer" role="contentinfo">
+    <p>&copy; 2026 Task Management System. Built with Angular & Node.js</p>
+  </footer>
   
   <!-- Sync Status Component -->
   <app-sync-status></app-sync-status>

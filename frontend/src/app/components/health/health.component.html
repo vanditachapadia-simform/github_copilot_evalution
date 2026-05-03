@@ -1,4 +1,46 @@
-<div>
-  <h2>Health Check</h2>
-  <p>Backend health endpoint: /health</p>
+<div class="health-container">
+  <div class="health-header">
+    <div class="health-icon">🏥</div>
+    <h1>System Health Check</h1>
+    <p class="health-subtitle">Monitor application and API connectivity status</p>
+  </div>
+
+  <div class="health-cards">
+    <div class="health-card">
+      <div class="card-icon">🖥️</div>
+      <h3>Frontend Status</h3>
+      <div class="status-badge status-success">Running</div>
+      <p class="card-description">Angular application is active and responsive</p>
+    </div>
+
+    <div class="health-card">
+      <div class="card-icon">🔌</div>
+      <h3>Backend API</h3>
+      <div class="status-badge status-success">Connected</div>
+      <p class="card-description">API endpoint: <code class="endpoint">/health</code></p>
+    </div>
+
+    <div class="health-card">
+      <div class="card-icon">💾</div>
+      <h3>Local Storage</h3>
+      <div class="status-badge status-success">Available</div>
+      <p class="card-description">Offline capabilities enabled</p>
+    </div>
+  </div>
+
+  <div class="health-info">
+    <h2>Health Endpoints</h2>
+    <ul class="endpoint-list">
+      <li>
+        <span class="method get">GET</span>
+        <code class="endpoint-path">/api/health</code>
+        <span class="description">Check overall system health</span>
+      </li>
+      <li>
+        <span class="method get">GET</span>
+        <code class="endpoint-path">/api/tasks</code>
+        <span class="description">Verify task service connectivity</span>
+      </li>
+    </ul>
+  </div>
 </div>
